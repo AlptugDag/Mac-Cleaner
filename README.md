@@ -5,118 +5,136 @@
 <h1 align="center">mac-cleaner</h1>
 
 <p align="center">
-  A zero-dependency bash script and one-click macOS Automator app that deep-cleans every cache, log and junk folder your Mac accumulates — with a special focus on Adobe Creative Cloud.
+  A zero-dependency bash script and one-click macOS Automator app that deep-cleans every cache, log, messaging media dump, and "System Data" junk folder your Mac accumulates — with special focus on Adobe Creative Cloud, video editors, and bloated communication apps.
   <br><br>
   <img src="https://img.shields.io/badge/macOS-12%2B-black" alt="macOS 12+">
   <img src="https://img.shields.io/badge/shell-bash-blue" alt="bash">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT">
+  <img src="https://img.shields.io/badge/safe-local_cache_only-brightgreen" alt="Safe: Local Cache Only">
 </p>
 
 ---
 
-## What it cleans
+## Why mac-cleaner?
 
-| Category | Details |
-|---|---|
-| **Adobe Creative Cloud** | Premiere Pro, After Effects, Photoshop, Lightroom, Audition, InDesign, Media Encoder, Bridge, Acrobat, XD, Character Animator, Substance 3D, Camera Raw — disk caches, preview renders, temp files, peak files, autosave data, shared media cache |
-| **DaVinci Resolve** | CacheClip, Gallery, app support cache |
-| **Xcode & iOS Dev** | DerivedData, DeviceSupport symbols, Simulator caches, unavailable simulator devices |
-| **Package managers** | Homebrew, npm, pip, pnpm, yarn, uv, Gradle, Cargo, CocoaPods, SwiftPM, Go, Cypress, Playwright |
-| **System & user** | `~/Library/Caches`, `~/Library/Logs`, per-user temp & cache in `/var/folders` (files > 3 days) |
-| **Messaging apps** | WhatsApp, Telegram (media cache), Discord, Slack, Spotify, Zoom, Microsoft Teams |
-| **Browsers** | Safari, Chrome, Firefox, Edge, Arc |
-| **Developer tools** | Docker (`system prune`), VS Code, Cursor, Android Studio |
-| **Trash** | Empties all Trash volumes via Finder |
+Ever opened **System Settings → General → Storage** only to find that **"System Data" (Sistem Verileri)** is hogging 50GB to 150GB+ of your SSD with no built-in way to see or clear what's inside?
 
-> **Nothing is deleted without your explicit confirmation.** Running without `--yes` is always a safe dry run.
+Finder lumps everything it doesn't consider standard user documents or photos into "System Data":
+- Huge media caches from video & audio suites (Adobe Premiere, After Effects, DaVinci Resolve)
+- Gigabytes of cached images, videos, and voice messages from **WhatsApp, Telegram, and Discord**
+- Hidden system temporary folders in `/private/var/folders` that macOS forgets to sweep
+- Build caches and toolchains from developer tools & package managers (Homebrew, npm, pip, Xcode)
+
+`mac-cleaner` hunts down these hidden disk hogs and reclaims your SSD in seconds.
 
 ---
 
-## Install
+## What It Cleans
 
-```bash
-git clone https://github.com/alptug/mac-cleaner.git
-cd mac-cleaner
-chmod +x clean.sh
-```
+### 1. 💬 Messaging & Social Apps (Local Caches Only)
+> **Safe guarantee:** This **only** deletes temporary media caches stored on your Mac. It **never** touches your chat histories or deletes media from your phone / cloud servers. Next time you view older media on WhatsApp or Telegram, it will simply re-download on demand.
+
+- **WhatsApp:** Cleans cache, temporary media downloads, and group container caches across both Mac App Store and direct Web downloads (`net.whatsapp.WhatsApp`, `desktop.WhatsApp`, and shared group containers).
+- **Telegram:** Wipes cached stickers, downloaded media (`account-*/postbox/media`), and account database caches.
+- **Discord:** Clears regular `Cache`, Chromium `Code Cache`, and accumulated crash reports (`Crashpad`).
+- **Slack:** Clears message caches and Service Worker `CacheStorage`.
+- **Spotify:** Purges bloated offline streaming cache (`PersistentCache`).
+- **Zoom & Microsoft Teams:** Purges diagnostic logs, support dump folders, and temporary blob storage.
+
+---
+
+### 2. 🖥️ macOS "System Data" & OS-Level Cleanup
+- **`/private/var/folders` Temporary Files:** macOS holds onto user temp and cache directories for weeks on machines that sleep instead of rebooting. Scans and prunes files older than 3 days.
+- **Deep User & System Logs:** Empties `~/Library/Logs/*` and user application error archives.
+- **System Caches:** Wipes user-level cache repositories in `~/Library/Caches/*`.
+- **Trash Bin:** Triggers native Finder AppleScript cleanup across all connected internal and external APFS volumes.
+
+---
+
+### 3. 🎨 Adobe Creative Cloud & Post-Production Suites
+Targets all installed versions of Adobe applications dynamically using recursive directory matching:
+
+- **Shared Media Caches:** Empties `Common/Media Cache Files`, `Common/Media Cache`, `Common/Peak Files`, `Common/PTX`, and `Common/Cache`.
+- **Premiere Pro:** Deletes project-level media cache files inside `~/Documents/Adobe/Premiere Pro/*/Profile-*/`.
+- **After Effects:** Cleans Disk Cache, preview renders, and temporary composition files.
+- **Photoshop:** Purges AutoRecover scratch state and temporary work files.
+- **Lightroom Classic & CC:** Wipes preview catalog files (`*.lrdata`) and sync caches.
+- **Audition:** Empties peak files and autosave directories.
+- **InDesign:** Removes orphaned `InDesign Recovery` files.
+- **Media Encoder:** Clears Surround cache and render log history.
+- **Substance 3D Suite:** Cleans Painter, Designer, Sampler, and Stager cache & temp folders.
+- **Camera Raw & Bridge:** Empties full RAW image cache and thumbnail libraries.
+- **Creative Cloud Desktop:** Clears CoreSync, OOBE, and UPI runtime cache files.
+- **DaVinci Resolve:** Clears `CacheClip`, gallery stills (`.gallery`), and application render cache.
+
+---
+
+### 4. 🛠️ Package Managers & Developer Stores
+Where tools provide built-in safe cleanup routines, `mac-cleaner` calls them natively to maintain registry integrity:
+
+- **Homebrew:** `brew cleanup -s` and `brew autoremove`
+- **Node.js:** `npm cache clean --force`, `pnpm store prune`, `yarn cache clean`
+- **Python:** `pip3 cache purge`, `uv cache clean`
+- **Apple / iOS:** Xcode `DerivedData`, `iOS/watchOS/tvOS DeviceSupport` symbol caches, CoreSimulator caches, and uninstalled simulator cleanup (`xcrun simctl delete unavailable`)
+- **Other Stores:** Gradle (`~/.gradle/caches`), Cargo registry caches, CocoaPods, SwiftPM, Go build cache, Cypress, and Playwright browsers
+
+---
+
+### 5. 🌐 Web Browsers
+- **Safari:** Cleans `com.apple.Safari` browser caches.
+- **Google Chrome & Edge:** Clears `Default/Cache` and `Media Cache`.
+- **Firefox:** Wipes `cache2` disk storage across all user profiles.
 
 ---
 
 ## Usage
 
-### Terminal (recommended for first use)
+### Option A: Interactive Terminal Script
 
-```bash
-./clean.sh            # dry run — see what would be deleted
-./clean.sh --yes      # actually delete
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/alptug/mac-cleaner.git
+   cd mac-cleaner
+   chmod +x clean.sh
+   ```
 
-### One-click Automator app
+2. Perform a **safe dry run** (shows exactly what would be removed without deleting anything):
+   ```bash
+   ./clean.sh
+   ```
 
-The repo includes a ready-to-use macOS Automator application in `OTOMATİK PC TEMİZLEME.app`.
-Double-click it from Finder — it will:
-
-1. Show a start notification immediately.
-2. Run the full clean in the background.
-3. Show a completion notification when done.
-
-#### Optional: Full Disk Access (recommended)
-
-macOS silently blocks access to `Trash`, `Mail`, `Messages` and other sandboxed folders without this grant.
-
-1. **Apple menu → System Settings → Privacy & Security → Full Disk Access**
-2. Click `+` and add **OTOMATİK PC TEMİZLEME.app**
-3. Toggle it on. macOS will quit the app — reopen it afterwards.
+3. Run with `--yes` to apply the cleanup and reclaim disk space:
+   ```bash
+   ./clean.sh --yes
+   ```
 
 ---
 
-## How it works
+### Option B: One-Click Desktop Application
 
-Every category uses a two-pass design:
+For daily convenience, the repo includes `OTOMATİK PC TEMİZLEME.app` (an Automator launcher):
 
-1. **Dry run** (`./clean.sh`) — expands all globs, prints every path it *would* remove, then exits. Nothing is touched.
-2. **Apply** (`./clean.sh --yes`) — iterates the same list, removes each path, prints a coloured summary, then reports how much disk space was reclaimed.
+1. Double-click `OTOMATİK PC TEMİZLEME.app`.
+2. A banner notification appears: *"PC Temizleme Başladı 🚀"*.
+3. Runs all cleanup tasks quietly in the background.
+4. When finished, displays a summary notification displaying completed tasks.
 
-Package managers that ship their own prune commands (`brew cleanup`, `npm cache clean`, `pip cache purge`, …) are called natively so their internal bookkeeping stays consistent. Plain `rm -rf` is used only when no native command exists.
-
-After the run, free space before and after is printed. macOS's Storage pane in System Settings recalculates lazily — reopen it or wait a moment to see the updated number.
-
----
-
-## Adobe coverage
-
-mac-cleaner targets every writable cache that Adobe applications produce, across **all installed versions** simultaneously:
-
-- **Shared** — `Common/Media Cache Files`, `Common/Media Cache`, `Common/Peak Files`, `Common/PTX`, `Common/Cache`
-- **Premiere Pro** — project-level media cache inside `~/Documents/Adobe`
-- **After Effects** — Disk Cache, preview renders, temp directories
-- **Photoshop** — AutoRecover files, Temp folder
-- **Lightroom Classic** — preview catalogue (`*.lrdata`), application caches
-- **Lightroom CC** — cloud sync caches
-- **Audition** — Autosave, Peaks
-- **InDesign** — InDesign Recovery folder
-- **Media Encoder** — Surround & Log folders
-- **Bridge** — thumbnail and metadata caches
-- **Acrobat / Reader** — application caches
-- **Camera Raw** — full cache directory
-- **Substance 3D** — Painter, Designer, Sampler, Stager — cache & temp
-- **Character Animator** — scene cache
-- **Creative Cloud app** — CoreSync logs, OOBE logs, UPI cache
-- **Dynamic Link** — media server cache
-- **Shared** — `~/Library/Logs/Adobe/*`, `~/Library/Caches/Adobe/*`, `com.adobe.dunamis` cache
+#### 💡 Granting Full Disk Access (Recommended)
+macOS restricts scripts from touching the Trash bin, Mail downloads, and select container directories unless granted permission:
+1. Open **System Settings → Privacy & Security → Full Disk Access**.
+2. Click `+` and add **OTOMATİK PC TEMİZLEME.app** (or your Terminal app).
+3. Toggle it **ON**.
 
 ---
 
-## Requirements
+## Safety & Design Philosophy
 
-macOS 12 (Monterey) or later. No third-party tools required.
+- **Zero External Dependencies:** Runs entirely on stock macOS bash, standard UNIX utilities (`find`, `awk`, `rm`), and AppleScript.
+- **Dry-Run by Default:** Calling `./clean.sh` without flags will never delete a single byte.
+- **Preserves Your Data:** Never touches projects, documents, photo libraries, or chat histories.
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
-
----
-
-*Made with ❤️ to stop Adobe from eating your SSD.*
+MIT License — feel free to fork, customize, and share!
