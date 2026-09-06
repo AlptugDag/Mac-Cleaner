@@ -87,43 +87,38 @@ Where tools provide built-in safe cleanup routines, `mac-cleaner` calls them nat
 
 ---
 
-## Usage
+## Installation & Usage
 
-### Option A: Interactive Terminal Script
+### 1. Terminal (via Make)
+```bash
+git clone https://github.com/AlptugDag/Mac-Cleaner.git
+cd Mac-Cleaner
+sudo make install
+```
+You can now run the tool from anywhere using:
+```bash
+mac-cleaner            # dry run — see what would be deleted
+mac-cleaner --yes      # actually delete
+mac-cleaner --help     # show help menu
+```
+*(If you prefer not to install it globally, you can just run `./clean.sh` from the folder).*
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/AlptugDag/Mac-Cleaner.git
-   cd Mac-Cleaner
-   chmod +x clean.sh
-   ```
+### 2. One-click Automator App
 
-2. Perform a **safe dry run** (shows exactly what would be removed without deleting anything):
-   ```bash
-   ./clean.sh
-   ```
+The repo includes a ready-to-use macOS Automator application in `MacCleaner.app`.
+Double-click it from Finder — it will:
 
-3. Run with `--yes` to apply the cleanup and reclaim disk space:
-   ```bash
-   ./clean.sh --yes
-   ```
+1. Show a start notification immediately.
+2. Run the full clean in the background.
+3. Show a completion notification when done.
 
----
+#### Optional: Full Disk Access (recommended)
 
-### Option B: One-Click Desktop Application
+macOS silently blocks access to `Trash`, `Mail`, `Messages` and other sandboxed folders without this grant.
 
-For daily convenience, the repo includes `OTOMATİK PC TEMİZLEME.app` (an Automator launcher):
-
-1. Double-click `OTOMATİK PC TEMİZLEME.app`.
-2. A banner notification appears: *"PC Temizleme Başladı 🚀"*.
-3. Runs all cleanup tasks quietly in the background.
-4. When finished, displays a summary notification displaying completed tasks.
-
-#### 💡 Granting Full Disk Access (Recommended)
-macOS restricts scripts from touching the Trash bin, Mail downloads, and select container directories unless granted permission:
-1. Open **System Settings → Privacy & Security → Full Disk Access**.
-2. Click `+` and add **OTOMATİK PC TEMİZLEME.app** (or your Terminal app).
-3. Toggle it **ON**.
+1. **Apple menu → System Settings → Privacy & Security → Full Disk Access**
+2. Click `+` and add **MacCleaner.app** (or your Terminal app).
+3. Toggle it on. macOS will quit the app — reopen it afterwards.
 
 ---
 

@@ -6,9 +6,20 @@
 # Usage:
 #   ./clean.sh            dry run  (shows what would be deleted)
 #   ./clean.sh --yes      apply    (actually deletes)
+#   ./clean.sh --help     show help
 # ─────────────────────────────────────────────────────────────────────────────
 
 set -uo pipefail
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  echo "mac-cleaner — Comprehensive macOS junk & cache cleaner"
+  echo ""
+  echo "Usage:"
+  echo "  ./clean.sh            Dry run (safe, deletes nothing)"
+  echo "  ./clean.sh --yes      Apply (actually deletes files)"
+  echo "  ./clean.sh --help     Show this help message"
+  exit 0
+fi
 
 APPLY=0
 [[ "${1:-}" == "--yes" ]] && APPLY=1
