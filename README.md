@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/icon.png" width="120" alt="mac-cleaner icon">
+  <img src="assets/icon.png" width="160" alt="Mac-Cleaner Liquid Glass Icon" style="border-radius: 34px;">
 </p>
 
 <h1 align="center">mac-cleaner</h1>
