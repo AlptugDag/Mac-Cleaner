@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
 # mac-cleaner — Comprehensive macOS junk & cache cleaner
-# https://github.com/alptug/mac-cleaner
+# https://github.com/AlptugDag/Mac-Cleaner
 #
 # Usage:
 #   ./clean.sh            dry run  (shows what would be deleted)

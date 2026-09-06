@@ -93,8 +93,8 @@ Where tools provide built-in safe cleanup routines, `mac-cleaner` calls them nat
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/alptug/mac-cleaner.git
-   cd mac-cleaner
+   git clone https://github.com/AlptugDag/Mac-Cleaner.git
+   cd Mac-Cleaner
    chmod +x clean.sh
    ```
 
